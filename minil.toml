@@ -1,0 +1,6 @@
+name = "Net-Moip-V2"
+# badges = ["travis"]
+authority="cpan:CAFEGRATZ"
+
+module_maker="ModuleBuildTiny"
+
