@@ -193,10 +193,10 @@ Net::Moip::V2 - Perl SDK for the Moip V2 API.
 
 =head1 DESCRIPTION
 
-Net::Moip::V2 is a SDK for Moip (Money Over IP) V2 API. The initial version
-of the module implements a thin wrapper for REST API, so you won't find methods
+Net::Moip::V2 is a SDK for Moip (Money Over IP) V2 API. This version of the
+module provides only a thin wrapper for the REST API, so you won't find methods
 like C<create_order()> or C<get_orders()>. What this module will do is help you
-build the endpoint paths, represented by L<Net::Moip::V2::Endpoint> and send
+build the endpoint paths, represented by L<Net::Moip::V2::Endpoint> objects and send
 http requests, with authentication handled for you.
 
 Higher level methods exists for requesting OAuth authorization and access token.
@@ -214,8 +214,9 @@ equivalent endpoint objects, and send your requests.
 
 =head2 build_authorization_url($redirect_uri, \@scope) :Str $url
 
-Builds the URL used to connect the user account to your Moip (OAuth) app. Usualy
-used in a web app controller to redirect the user's browser.
+Builds the URL used to connect the user account to your Moip (OAuth) app. Usually
+used in a web app controller to redirect the user's browser to the authorization
+page.
 
 C<$redirect_uri> is the URL the user will be redirected back to you app after
 authorization.
@@ -247,7 +248,7 @@ his browser will be redirected back to your app, with the url parameter C<code>
 containing the code you need to request the actual access token that you keep
 for future requests on behalf of your user.
 
-    # example of Mojoliciou controller receiving the code after user
+    # example of Mojolicious controller receiving the code after user
     # has authorized the permissions and connected his account to your app
     sub moip_callback {
         my $c = shift;
