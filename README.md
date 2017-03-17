@@ -1,6 +1,7 @@
+[![Build Status](https://travis-ci.org/cafe01/Net-Moip-V2.svg?branch=master)](https://travis-ci.org/cafe01/Net-Moip-V2) [![Coverage Status](https://img.shields.io/coveralls/cafe01/Net-Moip-V2/master.svg?style=flat)](https://coveralls.io/r/cafe01/Net-Moip-V2?branch=master)
 # NAME
 
-Net::Moip::V2 - Perl SDK for the Moip V2 API.
+Net::Moip::V2 - Perl SDK for the Moip (Money over IP) v2 API.
 
 # SYNOPSIS
 
@@ -59,6 +60,7 @@ page.
 
 `$redirect_uri` is the URL the user will be redirected back to you app after
 authorization.
+
 `\@scope` is the list of permssions you are asking authorization for.
 See [https://dev.moip.com.br/v2.0/reference#oauth-moip-connect](https://dev.moip.com.br/v2.0/reference#oauth-moip-connect) for the list of
 valid permissions.
