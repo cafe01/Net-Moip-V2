@@ -158,7 +158,7 @@ __END__
 
 =head1 NAME
 
-Net::Moip::V2 - Perl SDK for the Moip V2 API.
+Net::Moip::V2 - Perl SDK for the Moip (Money over IP) v2 API.
 
 =head1 SYNOPSIS
 
@@ -220,6 +220,7 @@ page.
 
 C<$redirect_uri> is the URL the user will be redirected back to you app after
 authorization.
+
 C<\@scope> is the list of permssions you are asking authorization for.
 See L<https://dev.moip.com.br/v2.0/reference#oauth-moip-connect> for the list of
 valid permissions.

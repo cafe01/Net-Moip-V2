@@ -2,6 +2,8 @@ Revision history for Perl extension Net-Moip-V2
 
 {{$NEXT}}
 
+    - configured travis and coveralls
+
 0.02 2017-03-17T16:31:13Z
 
     - added JSON dep to cpanfile
@@ -10,4 +12,3 @@ Revision history for Perl extension Net-Moip-V2
 0.01 2017-03-17T16:20:44Z
 
     - original version
-
