@@ -25,17 +25,32 @@ is $moip->build_authorization_url('http://mysite.com', ['FOO', 'BAR', 'BAZ']),
 subtest 'request_access_token' => sub {
 
     $Mock_furl->mock(post => sub {
-        is $_[1], 'https://connect-sandbox.moip.com.br/oauth/token';
+        is $_[1], 'https://connect-sandbox.moip.com.br/oauth/token', 'url';
         is $_[2], [
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Authentication' => $moip->_basic_auth_token,
             'Cache-Control:', 'no-cache'
-        ];
-        is $_[3], 'client_id=test_client_id&client_secret=test_client_secret&grant_type=authorization_code&redirect_uri=http%3A%2F%2Fmysite.com&code=THE-CODE';
+        ], 'headers';
+        is $_[3], 'client_id=test_client_id&client_secret=test_client_secret&grant_type=authorization_code&redirect_uri=http%3A%2F%2Fmysite.com&code=THE-CODE', 'content';
+
+        $Mock_furl_res->mock(content => sub { '{}' });
+        $Mock_furl_res
     });
 
     $moip->request_access_token('http://mysite.com', 'THE-CODE');
 
+
+    # error
+    $Mock_furl->mock(post => sub {
+
+        $Mock_furl_res->mock(is_success => sub { 0 });
+        $Mock_furl_res->mock(status_line => sub { 'mock error' });
+        $Mock_furl_res->mock(content => sub { '{}' });
+        $Mock_furl_res
+    });
+
+    my $res = $moip->request_access_token('http://mysite.com', 'THE-CODE');
+    is $res->{error}, 'mock error', 'request error';
 
 };
 

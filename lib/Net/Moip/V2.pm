@@ -3,7 +3,7 @@ package Net::Moip::V2;
 use IO::Socket::SSL;
 use MIME::Base64;
 use Furl;
-use JSON;
+use JSON ();
 use Moo;
 use URI;
 
@@ -39,6 +39,8 @@ has 'key', is => 'ro', required => 1;
 has 'client_id', is => 'ro';
 
 has 'client_secret', is => 'ro';
+
+has 'access_token', is => 'rw';
 
 
 
@@ -141,6 +143,12 @@ sub post {
 }
 
 
+sub decode_json {
+    my $self = shift;
+    $JSON->decode($_[0]);
+}
+
+
 
 
 1;
@@ -150,43 +158,140 @@ __END__
 
 =head1 NAME
 
-Net::Moip::V2 - It's new $module
+Net::Moip::V2 - Perl SDK for the Moip V2 API.
 
 =head1 SYNOPSIS
 
     use Net::Moip::V2;
 
     my $moip = Net::Moip::V2->new(
-        timeout => 10,
+        token => '...',          # required
+        key => '...',            # required
+        client_id => '...',      # OAuth app id
+        client_secret => '...',  # OAuth app secret
+        access_token => '...',   # OAuth access token
     );
 
-    # Working with the 'orders' collection
-    my $orders = $moip->collection('orders');
+    # Working with the 'orders' endpoint
+    my $ep_orders = $moip->endpoint('orders');
 
     # List orders: GET /orders
-    my @orders = $orders->get;
+    my $response = $ep_orders->get;
 
     # Create new order: POST /orders
-    my $new_order = $orders->post(\%params);
+    my $new_order = $ep_orders->post(\%params);
 
     # Fetch order
-    my $order = $orders->get($new_order->{id});
+    my $order = $ep_orders->get($new_order->{id});
 
-    # Related collection
-    my $order_payments = $order->collection('payments');
-
-    # List payments for a specific order
+    # Get order payments endpoint
     # GET /orders/<order id>/payments
-    my @order_payments = $order_payments->get;
+    $response = $moip->endpoint("orders/$order->{id}/payments")->get;
+
 
 
 
 =head1 DESCRIPTION
 
-Net::Moip::V2 is a thin wrapper over the Moip V2 API. Which means it's not an
-abstraction of actual REST API, so you won't find methods like C<create_order()> or
-C<get_orders()>. This module will help you build the endpoint path, and send
+Net::Moip::V2 is a SDK for Moip (Money Over IP) V2 API. The initial version
+of the module implements a thin wrapper for REST API, so you won't find methods
+like C<create_order()> or C<get_orders()>. What this module will do is help you
+build the endpoint paths, represented by L<Net::Moip::V2::Endpoint> and send
 http requests, with authentication handled for you.
+
+Higher level methods exists for requesting OAuth authorization and access token.
+See L</build_authorization_url> and L</request_access_token>
+
+Future versions can include a 'Client' class implementing a higher level of
+abstraction like the methdos cited above. Pull requests are welcome! :)
+
+For now, this 'wrapper' approach not only does the job, but also avoids me to
+invent another API and you to learn it. All you have to do is follow the
+L<official documentation|https://dev.moip.com.br/v2.0/reference>, build the
+equivalent endpoint objects, and send your requests.
+
+=head1 METHDOS
+
+=head2 build_authorization_url($redirect_uri, \@scope) :Str $url
+
+Builds the URL used to connect the user account to your Moip (OAuth) app. Usualy
+used in a web app controller to redirect the user's browser.
+
+C<$redirect_uri> is the URL the user will be redirected back to you app after
+authorization.
+C<\@scope> is the list of permssions you are asking authorization for.
+See L<https://dev.moip.com.br/v2.0/reference#oauth-moip-connect> for the list of
+valid permissions.
+
+    # example of a Mojolicious controller redirecting the browser
+    # to the "moip connect" page, where the user authorizes or declines the
+    # permissions you requested
+    sub moip_connect {
+        my $c = shift;
+
+        my $moip = Net::Moip::V2->new( ... );
+        my $callback_url = $c->url_for('moip-callback'); #
+        my $url = $moip->build_authorization_url(
+            'http://myapp.com/moip-callback',
+            ['RECEIVE_FUNDS', 'REFUND']
+        );
+
+        $c->redirect_to($url);
+    }
+
+
+=head2 request_access_token($redirect_uri, $code) :Hashref $response
+
+After the user has allowed the permissions you requested via the authorization url,
+his browser will be redirected back to your app, with the url parameter C<code>
+containing the code you need to request the actual access token that you keep
+for future requests on behalf of your user.
+
+    # example of Mojoliciou controller receiving the code after user
+    # has authorized the permissions and connected his account to your app
+    sub moip_callback {
+        my $c = shift;
+
+        my $moip = Net::Moip::V2->new( ... );
+        my $code = $c->req->param('code');
+        my $response = $moip->request_access_token(
+            'http://myapp.com/moip-callback',       # must be the same passed to build_authorization_url()
+            $code
+        );
+
+        if ($response->{error}) {
+            # show error page and return
+            ...
+            return;
+        }
+
+        # all good, $response contains the information you need to associate
+        # to the user account in you app: access token, moip account id,
+        # refresh token and token expiration date
+        ...
+    }
+
+=head2 endpoint($path)
+
+Returns a new endpoint object for sending requests to $path.
+
+    my $orders_ep = $moip->endpoint('orders');
+    my $single_order_payments_ep = $moip->endpoint("orders/ORD-123456789012/payments");
+
+See L<Net::Moip::V2::Endpoint>.
+
+=head2 get($endpoint [, @args])
+
+Shortcut for C<< $moip->endpoint('foo')->get(@args) >>.
+
+=head2 post($endpoint [, @args])
+
+Shortcut for C<< $moip->endpoint('foo')->post(@args) >>.
+
+=head1 ACKNOWLEDGMENTS
+
+The development of this software is supported by the brazilian startup
+L<Zoom Dentistas|http://www.zoomdentistas.com.br>.
 
 =head1 LICENSE
 
