@@ -2,6 +2,10 @@ Revision history for Perl extension Net-Moip-V2
 
 {{$NEXT}}
 
+0.04 2017-03-19T02:29:01Z
+
+    - fixed authorization header
+
 0.03 2017-03-17T16:52:31Z
 
     - configured travis and coveralls

@@ -9,7 +9,7 @@ use URI;
 
 use Net::Moip::V2::Endpoint;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 my $JSON = JSON->new->utf8;
 
