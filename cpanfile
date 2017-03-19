@@ -8,3 +8,4 @@ requires 'Furl';
 requires 'IO::Socket::SSL';
 requires 'MIME::Base64';
 requires 'JSON';
+requires 'URI';

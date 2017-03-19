@@ -28,8 +28,8 @@ subtest 'request_access_token' => sub {
         is $_[1], 'https://connect-sandbox.moip.com.br/oauth/token', 'url';
         is $_[2], [
             'Content-Type' => 'application/x-www-form-urlencoded',
-            'Authentication' => $moip->_basic_auth_token,
-            'Cache-Control:', 'no-cache'
+            'Authorization' => $moip->_basic_auth_token,
+            'Cache-Control', 'no-cache'
         ], 'headers';
         is $_[3], 'client_id=test_client_id&client_secret=test_client_secret&grant_type=authorization_code&redirect_uri=http%3A%2F%2Fmysite.com&code=THE-CODE', 'content';
 
@@ -43,6 +43,7 @@ subtest 'request_access_token' => sub {
     # error
     $Mock_furl->mock(post => sub {
 
+        $Mock_furl_res->mock(code => sub { 500 });
         $Mock_furl_res->mock(is_success => sub { 0 });
         $Mock_furl_res->mock(status_line => sub { 'mock error' });
         $Mock_furl_res->mock(content => sub { '{}' });

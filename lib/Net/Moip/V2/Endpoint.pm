@@ -43,7 +43,7 @@ sub get {
     my $url = join '/', $self->url, $id || ();
     $self->ua->get($url, [
         'Content-Type'   => 'application/json',
-        'Authentication' => $self->_basic_auth_token
+        'Authorization' => $self->_basic_auth_token
     ]);
 }
 
@@ -53,7 +53,7 @@ sub post {
     $self->ua->post($self->url, [
 
         'Content-Type'   => 'application/json',
-        'Authentication' => $self->_basic_auth_token
+        'Authorization' => $self->access_token ? 'OAuth '.$self->access_token : $self->_basic_auth_token
 
     ], $JSON->encode($data) );
 }

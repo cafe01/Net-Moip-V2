@@ -110,21 +110,22 @@ sub request_access_token {
     my ($url, $body) = $uri->as_string =~ /(.*?)\?(.*)/;
     my $res = $self->ua->post($url, [
         'Content-Type'   => 'application/x-www-form-urlencoded',
-        'Authentication' => $self->_basic_auth_token,
-        'Cache-Control:' => 'no-cache'
+        'Authorization' => $self->_basic_auth_token,
+        'Cache-Control' => 'no-cache'
     ], $body);
 
-    return { error => $res->status_line } unless $res->is_success;
-    my $data = $JSON->decode($res->content);
+    return { error => $res->status_line } if $res->code >= 500;
+    $JSON->decode($res->content);
 }
 
 
 
 
 sub endpoint {
-    my ($self, $path) = @_;
+    my ($self, $path, $params) = @_;
     die "Syntax: moip->endpoint(<name>)" unless $path;
     Net::Moip::V2::Endpoint->new(
+        %{ $params ||  {} },
         path => $path,
         map { $_ => $self->$_ } qw/ ua api_url token key client_id client_secret /
     );

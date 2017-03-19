@@ -41,7 +41,7 @@ subtest 'get' => sub {
         is $_[1], 'https://sandbox.moip.com.br/v2/orders';
         is $_[2], [
             'Content-Type' => 'application/json',
-            'Authentication' => $ep->_basic_auth_token,
+            'Authorization' => $ep->_basic_auth_token,
         ];
     });
 
@@ -60,7 +60,7 @@ subtest 'post' => sub {
         is $_[1], 'https://sandbox.moip.com.br/v2/orders';
         is $_[2], [
             'Content-Type' => 'application/json',
-            'Authentication' => $ep->_basic_auth_token,
+            'Authorization' => $ep->_basic_auth_token,
         ];
         is $_[3], '{"some":"json"}';
     });
