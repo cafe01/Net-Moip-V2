@@ -3,11 +3,11 @@ package Net::Moip::V2::Endpoint;
 use IO::Socket::SSL;
 use MIME::Base64;
 use Furl;
-use JSON ();
+use JSON::MaybeXS ();
 
 use Moo;
 
-my $JSON = JSON->new->utf8;
+my $JSON = JSON::MaybeXS->new->utf8;
 
 has 'path', is => 'ro', required => 1;
 
@@ -35,6 +35,17 @@ has 'url', is => 'ro', init_arg => undef, default => sub {
     join '/', $self->api_url, $self->path;
 };
 
+sub _authorization_string {
+    my $self = shift;
+    if ($self->{is_oauth}) {
+        my $access_token = $self->access_token
+            or die "Can't build OAuth authorization. access_token is missing.";
+
+        return "OAuth $access_token";
+    }
+
+    $self->_basic_auth_token;
+}
 
 
 sub get {
@@ -43,7 +54,7 @@ sub get {
     my $url = join '/', $self->url, $id || ();
     $self->ua->get($url, [
         'Content-Type'   => 'application/json',
-        'Authorization' => $self->_basic_auth_token
+        'Authorization' => $self->_authorization_string
     ]);
 }
 
@@ -53,10 +64,23 @@ sub post {
     $self->ua->post($self->url, [
 
         'Content-Type'   => 'application/json',
-        'Authorization' => $self->access_token ? 'OAuth '.$self->access_token : $self->_basic_auth_token
+        'Authorization' => $self->_authorization_string
 
     ], $JSON->encode($data) );
 }
+
+sub oauth_get {
+    my $self = shift;
+    local $self->{is_oauth} = 1;
+    $self->get(@_);
+}
+
+sub oauth_post {
+    my $self = shift;
+    local $self->{is_oauth} = 1;
+    $self->post(@_);
+}
+
 
 sub decode_json {
     my $self = shift;

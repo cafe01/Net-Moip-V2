@@ -7,8 +7,9 @@ use Data::Dumper;
 
 my $moip = Net::Moip::V2->new(
     sandbox => 1,
-    token   => $ENV{MOIP_TOKEN} || 'test_token',
-    key     => $ENV{MOIP_KEY} || 'test_key',
+    token   => 'test_token',
+    key     => 'test_key',
+    access_token => 'test_access_token',
 );
 
 
@@ -68,11 +69,31 @@ subtest 'post' => sub {
     $moip->endpoint('orders')->post({
         some => 'json'
     });
-
-
 };
 
+subtest 'oauth_get' => sub {
 
+    $Mock_furl->mock(get => sub {
+        is $_[1], 'https://sandbox.moip.com.br/v2/orders';
+        is $_[2], [
+            'Content-Type' => 'application/json',
+            'Authorization' => 'OAuth '.$moip->access_token,
+        ], 'oauth headers';
+    });
+
+    $moip->endpoint('orders')->oauth_get;
+
+    like dies { $moip->endpoint('orders', { access_token => undef })->oauth_get }, qr/access_token is missing/, 'missing access_token';
+
+    $Mock_furl->mock(get => sub {
+        is $_[2], [
+            'Content-Type' => 'application/json',
+            'Authorization' => $ep->_basic_auth_token,
+        ], 'basic auth again';
+    });
+
+    $moip->endpoint('orders')->get;
+};
 
 
 

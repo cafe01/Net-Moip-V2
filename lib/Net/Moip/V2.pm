@@ -3,15 +3,15 @@ package Net::Moip::V2;
 use IO::Socket::SSL;
 use MIME::Base64;
 use Furl;
-use JSON ();
+use JSON::MaybeXS ();
 use Moo;
 use URI;
 
 use Net::Moip::V2::Endpoint;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
-my $JSON = JSON->new->utf8;
+my $JSON = JSON::MaybeXS->new->utf8;
 
 has 'ua', is => 'ro', default => sub {
     Furl->new(
@@ -41,7 +41,6 @@ has 'client_id', is => 'ro';
 has 'client_secret', is => 'ro';
 
 has 'access_token', is => 'rw';
-
 
 
 has 'api_url', (
@@ -125,9 +124,9 @@ sub endpoint {
     my ($self, $path, $params) = @_;
     die "Syntax: moip->endpoint(<name>)" unless $path;
     Net::Moip::V2::Endpoint->new(
+        (map { $_ => $self->$_ } qw/ ua api_url token key client_id client_secret access_token /),
         %{ $params ||  {} },
         path => $path,
-        map { $_ => $self->$_ } qw/ ua api_url token key client_id client_secret /
     );
 }
 
