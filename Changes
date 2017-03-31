@@ -1,6 +1,8 @@
 Revision history for Perl extension Net-Moip-V2
 
 {{$NEXT}}
+
+0.06 2017-03-31T11:20:53Z
     - fixed undeclared Moo dependency
 
 0.05 2017-03-20T17:00:20Z

@@ -46,6 +46,7 @@
             "IO::Socket::SSL" : "0",
             "JSON::MaybeXS" : "0",
             "MIME::Base64" : "0",
+            "Moo" : "0",
             "URI" : "0"
          }
       },
@@ -68,7 +69,7 @@
          "web" : "https://github.com/cafe01/Net-Moip-V2"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_authority" : "cpan:CAFEGRATZ",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }
