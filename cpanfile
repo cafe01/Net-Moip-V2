@@ -4,6 +4,7 @@ on 'test' => sub {
     requires 'Test::Mock::Furl';
 };
 
+requires 'Moo';
 requires 'Furl';
 requires 'IO::Socket::SSL';
 requires 'MIME::Base64';
